@@ -1,0 +1,61 @@
+2. Koostage tabelite lepikult.yliopilased, lepikult.koduylesanded,
+lepikult.oppeained abil kursuse “Oracle” kodutööde andmed:
+
+SELECT opil.EESNIMI,
+       opil.PERENIMI,
+       TO_CHAR(kodyl.KUUPAEV, 'dd.mm.yyyy') AS "KUUPÄEV",
+       kodyl.TOO_NR                         AS "ÜL.NR.",
+       kodyl.PUNKTID                        AS "PUNKTE",
+       kodyl.FAILINIMI                      AS "FAIL"
+FROM LEPIKULT.OPPEAINED opea
+JOIN LEPIKULT.KODUYLESANDED kodyl ON opea.KOOD = kodyl.KURSUSEKOOD
+JOIN YLIOPILASED opil ON opil.ID = kodyl.YLIOPILASE_ID
+WHERE opea.NIMETUS LIKE '%Oracle%';
+
++-------+--------+----------+------+------+------+
+|EESNIMI|PERENIMI|KUUPÄEV   |ÜL.NR.|PUNKTE|FAIL  |
++-------+--------+----------+------+------+------+
+|Katrin |Kask    |17.06.2003|1     |8.0   |t3.txt|
+|Katrin |Kask    |11.06.2004|2     |7.0   |t2.txt|
+|Katrin |Kask    |13.04.2018|1     |0.0   |NULL  |
+|Kairi  |M„nd    |01.06.2003|1     |10.0  |t7.txt|
+|Salme  |Saar    |11.07.2003|1     |10.0  |t8.txt|
+|Salme  |Saar    |11.06.2004|3     |6.0   |t2.txt|
+|Liina  |Vaher   |11.06.2004|3     |8.0   |t3.txt|
++-------+--------+----------+------+------+------+
+
+3. Koostada nende tudengite nimekiri, kes ei ole saatnud üheski õppeaines
+ainsatki kodutööd
+
+SELECT ID, EESNIMI, PERENIMI
+FROM LEPIKULT.YLIOPILASED opilane
+LEFT JOIN KODUYLESANDED ylesanne ON opilane.ID = ylesanne.YLIOPILASE_ID
+WHERE ylesanne.YLIOPILASE_ID IS NULL;
+
++--------+-------+--------+
+|ID      |EESNIMI|PERENIMI|
++--------+-------+--------+
+|10020012|Tarmo  |Kuusk   |
++--------+-------+--------+
+
+4.Fikseerige tabelis „sugupuu” üks nimi (näiteks nii: …. WHERE e.nimi =
+‘Karin’ ….) ja leidke kõik tema lapselapsed.
+
+SELECT lapselaps.NIMI, lapselaps.KOOD, lapselaps.ISAKOOD, lapselaps.EMAKOOD
+FROM SUGUPUU isik
+JOIN SUGUPUU laps ON laps.EMAKOOD = isik.KOOD OR laps.ISAKOOD = isik.KOOD
+JOIN SUGUPUU lapselaps ON lapselaps.EMAKOOD = laps.KOOD OR lapselaps.ISAKOOD = laps.KOOD
+WHERE isik.NIMI = 'Karin';
+
++------+----+-------+-------+
+|NIMI  |KOOD|ISAKOOD|EMAKOOD|
++------+----+-------+-------+
+|Tambet|9   |1      |4      |
+|Anne  |12  |1      |4      |
+|Henrik|77  |1      |50     |
+|Liis  |13  |2      |18     |
+|Jaanus|7   |11     |20     |
++------+----+-------+-------+
+
+
+

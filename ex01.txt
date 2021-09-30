@@ -1,0 +1,43 @@
+1)
+Kasutasin Putty ja Oracle DB PhpStorm-is 
+
+2)
+describe KANDIDAADID
+
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ ID                                                 CHAR(11)
+ EESNIMI                                            VARCHAR2(20)
+ PERENIMI                                           VARCHAR2(30)
+ MATEMAATIKA                                        NUMBER(3)
+ VOORKEEL                                           NUMBER(3)
+ EMAKEEL                                            NUMBER(3)
+
+3)
+INSERT INTO KANDIDAADID (ID, EESNIMI, PERENIMI, MATEMAATIKA, VOORKEEL, EMAKEEL)
+VALUES (50001040267, 'AHMED', 'ABDULLAJEV', 11, 79, 81)
+	
+ID,EESNIMI,PERENIMI,MATEMAATIKA,VOORKEEL,EMAKEEL
+50001040267,AHMED,ABDULLAJEV,11,79,81
+
+4)
+UPDATE KANDIDAADID SET MATEMAATIKA = 99, VOORKEEL = 99
+WHERE EESNIMI = 'AHMED'
+
+ID,EESNIMI,PERENIMI,MATEMAATIKA,VOORKEEL,EMAKEEL
+50001040267,AHMED,ABDULLAJEV,99,99,81
+
+5)
+SELECT * FROM KANDIDAADID WHERE ID = 50001040267
+
+ID,EESNIMI,PERENIMI,MATEMAATIKA,VOORKEEL,EMAKEEL
+50001040267,AHMED,ABDULLAJEV,99,99,81
+
+6)
+DELETE FROM KANDIDAADID WHERE ID = 50001040267
+OR LENGTH(ID) != 11
+OR substr(ID, 1,1) > 6
+OR substr(ID, 4, 2) > 12
+OR substr(ID, 6, 2) > 31
+
+1 row affected.

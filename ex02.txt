@@ -1,0 +1,35 @@
+1)
+Leidke tabelist kandidaadid need tütarlapsed (töödeldes isikukoodi) , kelle
+emakeeleeksami tulemus on üle 60 punkti.
+
+SELECT ID, EESNIMI, PERENIMI, EMAKEEL FROM KANDIDAADID
+WHERE mod(substr(ID, 1, 1),2) = 0 AND EMAKEEL > 60
+
+#,ID,EESNIMI,PERENIMI,EMAKEEL
+1,48612104788,Pirjo,Kask,90
+2,48606160001,Mari,Maasikas,94
+3,48604040404,Liina,Vaarikas,90
+4,48408300221,KATI,TAMM,65
+5,47906254928,KARIINA,?MARIK,80
+6,48510130236,MARJU,HILLEP,70
+7,47501024720,NATALIA,RAUDSEPP,65
+8,48304246532,PAMELA,BESSONOV,70
+9,48405060298,ANNELY,MESILA,65
+10,48612103455,Pirjo,Kuusemaa,98
+
+
+2)Isikukoodi töödeldes väljastage nende nimed ja sünnidaatumid, kelle selle
+aasta sünnipäev on veel ees. Järjestage tulemus sünnipäevapidude toimumise
+“ajakava” järgi: Tegin kõik kokku:
+
+SELECT EESNIMI, PERENIMI, CASE WHEN substr(ID, 1, 1) <= 4
+THEN to_char(to_date(concat('19', substr(ID, 2, 6)), 'YYYYmmdd'), 'dd.mm.yyyy')
+ELSE to_char(to_date(concat('20', substr(ID, 2, 6)), 'YYYYmmdd'), 'dd.mm.yyyy')
+END AS SÜNNIAEG FROM KANDIDAADID
+WHERE mod(substr(ID, 1, 1),2) = 0 AND to_date(substr(ID, 4, 4), 'mmdd') > sysdate AND EMAKEEL > 60
+order by substr(ID, 4, 4)
+
+#,EESNIMI,PERENIMI,SÜNNIAEG
+1,Pirjo,Kask,10.12.1986
+2,MARJU,HILLEP,13.10.1985
+3,Pirjo,Kuusemaa,10.12.1986
