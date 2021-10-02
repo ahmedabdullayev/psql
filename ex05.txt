@@ -1,0 +1,94 @@
+1. Leidke tabelite lepikult.yliopilased, lepikult.koduylesanded ja
+lepikult.oppeained abil iga tudengi keskmine “punktisaak” koduste
+tööde eest:
+
+SELECT op.EESNIMI, op.PERENIMI, round(avg(ky.PUNKTID), 1) AS "kesk. punkte"
+from LEPIKULT.koduylesanded ky
+JOIN LEPIKULT.yliopilased op on op.ID = ky.YLIOPILASE_ID
+group by op.EESNIMI, op.PERENIMI
+ORDER BY "kesk. punkte" DESC;
+
++-------+--------+------------+
+|EESNIMI|PERENIMI|kesk. punkte|
++-------+--------+------------+
+|Liina  |Vaher   |8.8         |
+|Salme  |Saar    |7.9         |
+|Kairi  |M„nd    |7.1         |
+|Katrin |Kask    |5.9         |
++-------+--------+------------+
+
+2. Samade tabelite põhjal leidke, mitu tööd on oracle-aine ülesannete
+kohta saadetud. Grupeerige ülesande numbri kaupa:
+
+SELECT yl.TOO_NR AS "TÖÖ NR.", count(yl.TOO_NR) AS ARV
+FROM LEPIKULT.KODUYLESANDED yl
+JOIN OPPEAINED op ON op.KOOD = yl.KURSUSEKOOD
+WHERE FAILINIMI IS NOT NULL
+GROUP BY yl.TOO_NR, op.NIMETUS
+HAVING lower(op.NIMETUS) LIKE '%oracle%'
+ORDER BY yl.TOO_NR;
+
++-------+---+
+|TÖÖ NR.|ARV|
++-------+---+
+|1      |3  |
+|2      |1  |
+|3      |2  |
++-------+---+
+
+3. Uurige tabeli scott.kandidaadid abil välja, millisel aastal sündinud
+naisterahvaste emakeele keskmine hinne on kõige kõrgem:
+
+SELECT tulemus.AASTA, tulemus.keskmine
+FROM (
+         SELECT substr(ID, 2, 2) AASTA, AVG(EMAKEEL) keskmine
+         FROM SCOTT.KANDIDAADID
+         WHERE ID LIKE '4%'
+         GROUP BY substr(ID, 2, 2), EMAKEEL
+     ) tulemus
+WHERE keskmine = (
+    SELECT MAX(altulemus.keskmine)
+    FROM (
+             SELECT substr(ID, 2, 2), AVG(EMAKEEL) keskmine
+             FROM SCOTT.KANDIDAADID
+             WHERE ID LIKE '4%'
+             GROUP BY substr(ID, 2, 2), EMAKEEL
+         ) altulemus
+);
+
++-----+--------+
+|AASTA|KESKMINE|
++-----+--------+
+|86   |98      |
++-----+--------+
+
+4. Leidke tabelite lepikult.yliopilased, lepikult.koduylesanded,
+lepikult.oppeained abil iga õppeaine parimad üliõpilased - nende
+nimed, kelle tööde keskmine punktide arv (töö kohta) on parim:
+
+SELECT tulemus.NIMETUS,
+       tulemus.PERENIMI,
+       tulemus.EESNIMI,
+       tulemus.PUNKTID
+FROM (
+         SELECT oppeaine.NIMETUS,
+                opilane.PERENIMI,
+                opilane.EESNIMI,
+                AVG(PUNKTID) as PUNKTID,
+                ROW_NUMBER() OVER (PARTITION BY oppeaine.NIMETUS ORDER BY AVG(PUNKTID) DESC ) AS rowN
+         FROM LEPIKULT.KODUYLESANDED kodyl
+                  JOIN OPPEAINED oppeaine ON oppeaine.KOOD = kodyl.KURSUSEKOOD
+                  JOIN YLIOPILASED opilane ON opilane.ID = kodyl.YLIOPILASE_ID
+         GROUP BY oppeaine.NIMETUS, opilane.PERENIMI, opilane.EESNIMI
+     ) tulemus WHERE tulemus.rowN = 1;
+
+
++----------------------------------+--------+-------+-------+
+|NIMETUS                           |PERENIMI|EESNIMI|PUNKTID|
++----------------------------------+--------+-------+-------+
+|Digitaalkommunikatsioon           |Saar    |Salme  |10     |
+|Digitaalne heli- ja pildit””tlus  |Saar    |Salme  |5.5    |
+|Operatsioonissteemide tehnoloogia |Kask    |Katrin |7      |
+|Oracle:  SQL ja PL/SQL            |M„nd    |Kairi  |10     |
+|Riistvaral„hedane programmeerimine|Vaher   |Liina  |9.5    |
++----------------------------------+--------+-------+-------+
