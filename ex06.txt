@@ -1,0 +1,20 @@
+Sisestage õppeaine nimetus: Digitaalk
+
+                          Aine: Digitaalkommunikatsioon
+
+Nimi            Ülesanne    Punktid Kuupäev
+--------------- -------- ---------- ---------------
+Kask, Katrin           2        6.5 21.06.2003
+Kask, Katrin           1          5 11.06.2003
+M„nd, Kairi            2        2.5 11.08.2003
+M„nd, Kairi            1         10 01.06.2003
+Saar, Salme            1         10 11.07.2003
+
+
+
+
+
+
+
+
+                              Õppejoud: Heldur Haak
