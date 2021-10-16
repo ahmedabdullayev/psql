@@ -1,0 +1,128 @@
+1. Tehke endale (enda kasutajatunnuse all) koopiad...
+
+GRANT SELECT ON oppeained to AABDULLAJEV;
+GRANT SELECT ON uued_oppeained to AABDULLAJEV;
+
+CREATE TABLE minu_oppeained AS (SELECT * FROM scott.oppeained);
+CREATE TABLE minu_uued_oppeained AS (SELECT * FROM scott.uued_oppeained);
+
+2. Lisage tabeli oppeained koopiasse kahe uue õppeaine (sellised, mida tabelis ei
+leidu) andmed. Kontrollige tulemust.
+
+Kontrollime enne INSERT:
+
+SELECT * from minu_oppeained;
+
++------+---------------+----------------------------------+
+|KOOD  |OPPEJOUD       |NIMETUS                           |
++------+---------------+----------------------------------+
+|I319  |Toomas Lepikult|Oracle:  SQL ja PL/SQL            |
+|Id310 |Vladimir Viies |Operatsioonissteemide tehnoloogia|
+|Iad307|Heldur Haak    |Digitaalkommunikatsioon           |
+|Id309 |Peeter Marvet  |Digitaalne heli- ja pildit””tlus  |
+|ID218 |Toomas Kont    |Riistvaral„hedane programmeerimine|
++------+---------------+----------------------------------+
+5 rows retrieved
+
+Päringud:
+
+INSERT INTO minu_oppeained (KOOD, OPPEJOUD, NIMETUS)
+VALUES ('ICD003', 'Meelis Antoi', 'IT süsteemide kasutatavus')
+
+INSERT INTO minu_oppeained (KOOD, OPPEJOUD, NIMETUS)
+VALUES ('YTG060', 'Yevgen Karpichev', 'Keskkonnakaitse ja säästev areng')
+
+Kontroll:
+
+SELECT * FROM minu_oppeained;
+
++------+----------------+----------------------------------+
+|KOOD  |OPPEJOUD        |NIMETUS                           |
++------+----------------+----------------------------------+
+|I319  |Toomas Lepikult |Oracle:  SQL ja PL/SQL            |
+|Id310 |Vladimir Viies  |Operatsioonissteemide tehnoloogia|
+|Iad307|Heldur Haak     |Digitaalkommunikatsioon           |
+|Id309 |Peeter Marvet   |Digitaalne heli- ja pildit””tlus  |
+|ID218 |Toomas Kont     |Riistvaral„hedane programmeerimine|
+|ICD003|Meelis Antoi    |IT süsteemide kasutatavus         |
+|YTG060|Yevgen Karpichev|Keskkonnakaitse ja säästev areng  |
++------+----------------+----------------------------------+
+7 rows retrieved
+
+3.Korrigeerige tabeli uued_oppeained koopia abil tabelit minu_oppeained, kasutades
+käsku MERGE. Kontrollige tulemust.
+
+Kontrollime enne MERGE:
+
+SELECT * FROM minu_uued_oppeained;
+
++------+---------------+----------------------------------+
+|KOOD  |OPPEJOUD       |NIMETUS                           |
++------+---------------+----------------------------------+
+|I319  |Toomas Lepikult|Oracle:  SQL ja PL/SQL            |
+|Id310 |Vladimir Viies |Operatsioonissteemide tehnoloogia|
+|Iad307|Heldur Haak    |Digitaalkommunikatsioon           |
+|Id309 |Peeter Marvet  |Digitaalne heli- ja pildit””tlus  |
+|ID218 |Toomas Kont    |Riistvaral„hedane programmeerimine|
+|I220  |Indrek Meos    |Filosoofia                        |
++------+---------------+----------------------------------+
+6 rows retrieved
+
+Päringud:
+
+SAVEPOINT before_merge;
+
+MERGE INTO minu_uued_oppeained uo
+USING minu_oppeained mo
+ON (mo.kood = uo.kood)
+WHEN MATCHED THEN
+    UPDATE
+    SET uo.oppejoud=mo.oppejoud,
+        uo.nimetus=mo.nimetus
+WHEN NOT MATCHED THEN
+    INSERT (kood, nimetus, oppejoud)
+    VALUES (mo.kood, mo.nimetus, mo.oppejoud);
+
+Kontroll:
+
+SELECT * FROM minu_uued_oppeained;
+
++------+----------------+----------------------------------+
+|KOOD  |OPPEJOUD        |NIMETUS                           |
++------+----------------+----------------------------------+
+|I319  |Toomas Lepikult |Oracle:  SQL ja PL/SQL            |
+|Id310 |Vladimir Viies  |Operatsioonissteemide tehnoloogia|
+|Iad307|Heldur Haak     |Digitaalkommunikatsioon           |
+|Id309 |Peeter Marvet   |Digitaalne heli- ja pildit””tlus  |
+|ID218 |Toomas Kont     |Riistvaral„hedane programmeerimine|
+|I220  |Indrek Meos     |Filosoofia                        |
+|ICD003|Meelis Antoi    |IT süsteemide kasutatavus         |
+|YTG060|Yevgen Karpichev|Keskkonnakaitse ja säästev areng  |
++------+----------------+----------------------------------+
+8 rows retrieved
+
+4. Annulleerige viimane samm ja kontrollige tulemust.
+
+ROLLBACK TO before_merge;
+
+SELECT * FROM minu_uued_oppeained;
+
++------+---------------+----------------------------------+
+|KOOD  |OPPEJOUD       |NIMETUS                           |
++------+---------------+----------------------------------+
+|I319  |Toomas Lepikult|Oracle:  SQL ja PL/SQL            |
+|Id310 |Vladimir Viies |Operatsioonissteemide tehnoloogia|
+|Iad307|Heldur Haak    |Digitaalkommunikatsioon           |
+|Id309 |Peeter Marvet  |Digitaalne heli- ja pildit””tlus  |
+|ID218 |Toomas Kont    |Riistvaral„hedane programmeerimine|
+|I220  |Indrek Meos    |Filosoofia                        |
++------+---------------+----------------------------------+
+6 rows retrieved
+
+COMMIT;
+
+
+
+
+
+
