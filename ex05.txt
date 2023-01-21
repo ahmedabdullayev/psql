@@ -41,26 +41,27 @@ naisterahvaste emakeele keskmine hinne on kõige kõrgem:
 
 SELECT tulemus.AASTA, tulemus.keskmine
 FROM (
-         SELECT substr(ID, 2, 2) AASTA, AVG(EMAKEEL) keskmine
+         SELECT to_char(TO_DATE(substr(id, 2, 2), 'rrrr'), 'yyyy') AASTA, AVG(EMAKEEL) keskmine
          FROM SCOTT.KANDIDAADID
-         WHERE ID LIKE '4%'
-         GROUP BY substr(ID, 2, 2), EMAKEEL
+         WHERE ID LIKE '4%' OR ID LIKE '6%'
+         GROUP BY substr(ID, 2, 2)
      ) tulemus
 WHERE keskmine = (
     SELECT MAX(altulemus.keskmine)
     FROM (
-             SELECT substr(ID, 2, 2), AVG(EMAKEEL) keskmine
+             SELECT AVG(EMAKEEL) keskmine
              FROM SCOTT.KANDIDAADID
-             WHERE ID LIKE '4%'
-             GROUP BY substr(ID, 2, 2), EMAKEEL
+             WHERE ID LIKE '4%' OR ID LIKE '6%'
+             GROUP BY substr(ID, 2, 2)
          ) altulemus
 );
 
 +-----+--------+
 |AASTA|KESKMINE|
 +-----+--------+
-|86   |98      |
+|1991 |98.5    |
 +-----+--------+
+
 
 4. Leidke tabelite lepikult.yliopilased, lepikult.koduylesanded,
 lepikult.oppeained abil iga õppeaine parimad üliõpilased - nende

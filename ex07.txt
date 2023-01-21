@@ -9,9 +9,9 @@ CREATE TABLE minu_uued_oppeained AS (SELECT * FROM scott.uued_oppeained);
 2. Lisage tabeli oppeained koopiasse kahe uue õppeaine (sellised, mida tabelis ei
 leidu) andmed. Kontrollige tulemust.
 
-Kontrollime enne INSERT:
+Kontrollime enne insert:
 
-SELECT * from minu_oppeained;
+SELECT * FROM minu_oppeained;
 
 +------+---------------+----------------------------------+
 |KOOD  |OPPEJOUD       |NIMETUS                           |
@@ -52,7 +52,7 @@ SELECT * FROM minu_oppeained;
 3.Korrigeerige tabeli uued_oppeained koopia abil tabelit minu_oppeained, kasutades
 käsku MERGE. Kontrollige tulemust.
 
-Kontrollime enne MERGE:
+Kontrollime enne merge:
 
 SELECT * FROM minu_uued_oppeained;
 

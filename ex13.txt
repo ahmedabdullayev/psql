@@ -1,0 +1,179 @@
+1. Koostage tabel, mis sisaldab üliõpilaste ees-ja perekonnanimesid (10 nime ) ning
+algselt tühja veergu email. 
+
+
+
+CREATE TABLE emails
+(
+    id       NUMBER GENERATED AS IDENTITY CONSTRAINT emails_pk PRIMARY KEY,
+    eesnimi  VARCHAR2(255) NOT NULL,
+    perenimi VARCHAR2(255) NOT NULL,
+    email    VARCHAR2(255)
+);
+
+
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Vaino', 'Erilaid');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Kristo', 'Harakas');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Priit', 'Joorits');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Paul', 'Joorits');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Kristi', 'Karusaar');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Kristjan', 'Laukasaar');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Peeter', 'Kuulres');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Poerte', 'Kusterd');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Andre', 'Palusa');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Makri', 'Lalusa');
+
+
+KONTROLL:
+
+SELECT * FROM emails;
+
++--+--------+---------+-----+
+|ID|EESNIMI |PERENIMI |EMAIL|
++--+--------+---------+-----+
+|1 |Vaino   |Erilaid  |NULL |
+|2 |Kristo  |Harakas  |NULL |
+|3 |Priit   |Joorits  |NULL |
+|4 |Paul    |Joorits  |NULL |
+|5 |Kristi  |Karusaar |NULL |
+|6 |Kristjan|Laukasaar|NULL |
+|7 |Peeter  |Kuulres  |NULL |
+|8 |Poerte  |Kusterd  |NULL |
+|9 |Andre   |Palusa   |NULL |
+|10|Makri   |Lalusa   |NULL |
++--+--------+---------+-----+
+
+2. Seejärel koostage PL/SQL-programm, mis moodustab igale üliõpilasele e-aadressi
+järgneva eeskirja kohaselt.
+a) üliõpilase eesnimest võetakse esimene täht ning perekonnanimi kogu pikkuses;
+b) kui nii kipub tekkima ühesuguseid kasutajanimesid, võetakse 2. kasutajatunnuse
+moodustamisel eesnimest ühe asemel kaks tähte;
+c) Kui moodustatud kasutajanimi on pikem kui 8 sümbolit, lõigatakse lõpust
+üleliigsed sümbolid ära
+d) kasutajatunnusele lisatakse juurde „@itcollege.ee“. 
+
+
+PROTSEDUUR:
+
+CREATE OR REPLACE PROCEDURE 
+create_email_aadress(eesnimi_v IN emails.eesnimi%TYPE,
+perenimi_v IN emails.perenimi%TYPE,
+email_v OUT emails.email%TYPE) IS
+    v_email_id_available        BOOLEAN := TRUE;
+    v_email_id_altern_available BOOLEAN := TRUE;
+    v_source_name_concat        emails.email%TYPE;
+    v_target_name_concat        emails.email%TYPE;
+    v_source_email_id           emails.email%TYPE;
+    v_target_email_id           emails.email%TYPE;
+    v_source_email_id_altern    emails.email%TYPE;
+    v_target_email_id_altern    emails.email%TYPE;
+    v_target_email              emails.email%TYPE;
+    email_cur                   SYS_REFCURSOR;
+
+BEGIN
+    v_source_name_concat := concat(eesnimi_v, perenimi_v);
+    v_source_email_id := substr(lower(substr(eesnimi_v, 1, 1) || substr(perenimi_v, 1, length(perenimi_v))), 1, 8);
+    v_source_email_id_altern := substr(lower(substr(eesnimi_v, 1, 2) || substr(perenimi_v, 1, length(perenimi_v))), 1, 8);
+
+    email_v := v_source_email_id;
+
+    OPEN email_cur FOR 'SELECT concat(eesnimi, perenimi)                                        AS name_concat,
+       substr(lower(substr(eesnimi, 1, 1) || substr(perenimi, 1, length(perenimi))),1,8)        AS target,
+              substr(lower(substr(eesnimi, 1, 2) || substr(perenimi, 1, length(perenimi))),1,8) AS target_alternative,
+       email
+    FROM emails';
+    
+    LOOP
+        FETCH email_cur INTO v_target_name_concat, v_target_email_id, v_target_email_id_altern, v_target_email;
+        IF v_source_name_concat != v_target_name_concat THEN
+            IF v_source_email_id = v_target_email_id THEN
+                v_email_id_available := FALSE;
+            END IF;
+            IF v_source_email_id_altern = v_target_email_id_altern THEN
+                v_email_id_altern_available := FALSE;
+            END IF;
+        END IF;
+        EXIT WHEN email_cur%NOTFOUND;
+    END LOOP;
+    CLOSE email_cur;
+
+    IF v_email_id_available = TRUE THEN
+        email_v := v_source_email_id;
+    END IF;
+    IF NOT v_email_id_available AND v_email_id_altern_available = TRUE THEN
+        email_v := v_source_email_id_altern;
+    END IF;
+    IF NOT v_email_id_available AND v_email_id_altern_available = FALSE THEN
+        RAISE_APPLICATION_ERROR (-20000, 'KONFLIKT! ' ||  eesnimi_v || ' ' ||  perenimi_v || ' Emaili aadressi koostamisel: '
+                                             || v_source_email_id || '@itcollege.ee'|| ' ja '
+                                             || v_source_email_id_altern || '@itcollege.ee'|| ' on juba hoivatud!');
+    END IF;
+    email_v := email_v || '@itcollege.ee';
+    UPDATE emails SET email = email_v WHERE eesnimi = eesnimi_v AND perenimi = perenimi_v;
+    COMMIT;
+END create_email_aadress;
+
+
+SKRIPT:
+
+DECLARE
+    CURSOR cur IS SELECT * FROM emails;
+    v_email          emails.email%TYPE;
+    rw                     cur%ROWTYPE;
+BEGIN
+    FOR rw IN cur
+        LOOP
+            CREATE_EMAIL_AADRESS(
+                    EESNIMI_V => rw.eesnimi,
+                    PERENIMI_V => rw.perenimi,
+                    EMAIL_V => rw.email
+                );
+        END LOOP;
+END;
+
+
+KONTROLL:
+
+SELECT * FROM emails;
+
++--+--------+---------+----------------------+
+|ID|EESNIMI |PERENIMI |EMAIL                 |
++--+--------+---------+----------------------+
+|1 |Vaino   |Erilaid  |verilaid@itcollege.ee |   a) üliõpilase eesnimest võetakse esimene täht ning perekonnanimi kogu pikkuses;
+|2 |Kristo  |Harakas  |kharakas@itcollege.ee |
+|3 |Priit   |Joorits  |prjoorit@itcollege.ee |   b) kui nii kipub tekkima ühesuguseid kasutajanimesid, võetakse 2. kasutajatunnuse
+|4 |Paul    |Joorits  |pajoorit@itcollege.ee |      moodustamisel eesnimest ühe asemel kaks tähte;
+|5 |Kristi  |Karusaar |kkarusaa@itcollege.ee |   c) Kui moodustatud kasutajanimi on pikem kui 8 sümbolit, lõigatakse lõpust
+|6 |Kristjan|Laukasaar|klaukasa@itcollege.ee |      üleliigsed sümbolid ära
+|7 |Peeter  |Kuulres  |pkuulres@itcollege.ee |      
+|8 |Poerte  |Kusterd  |pkusterd@itcollege.ee |   d) kasutajatunnusele lisatakse juurde „@itcollege.ee“. 
+|9 |Andre   |Palusa   |apalusa@itcollege.ee  |
+|10|Makri   |Lalusa   |mlalusa@itcollege.ee  |
++--+--------+---------+----------------------+
+
+
+Lisame sarnased nimed, et kontrollida exceptioni toimimist:
+
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Priit', 'JooritsA');
+INSERT INTO emails (eesnimi, perenimi) VALUES ('Priit', 'JooritsB');
+
+DECLARE
+    CURSOR cur IS SELECT * FROM emails;
+    v_email          emails.email%TYPE;
+    rw                     cur%ROWTYPE;
+BEGIN
+    FOR rw IN cur
+        LOOP
+            CREATE_EMAIL_AADRESS(
+                    EESNIMI_V => rw.eesnimi,
+                    PERENIMI_V => rw.perenimi,
+                    EMAIL_V => rw.email
+                );
+        END LOOP;
+END;
+
+Kui käivitame skripti siis saame exception'i:
+
+Error report -
+ORA-20000: KONFLIKT! Priit Joorits Emaili aadressi koostamisel: pjoorits@itcollege.ee ja prjoorit@itcollege.ee on juba hoivatud!
+

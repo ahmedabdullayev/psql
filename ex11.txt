@@ -1,0 +1,123 @@
+1. Kirjutage PL/SQL-programm, mis leiab tabelist
+kandidaadid, mitu inimest on sündinud 1982. a. 1. kuus, 1982.
+a. 2. kuus jne. kuni 1984.a. 12. kuus:
+
+SET serveroutput on
+DECLARE
+    min_synniaasta CONSTANT INTEGER := 82;
+    max_synniaasta CONSTANT INTEGER := 84;
+    cur                     SYS_REFCURSOR;
+    v_month                 NUMBER;
+    v_year                  NUMBER;
+    v_counter               NUMBER;
+BEGIN
+    OPEN cur FOR 'SELECT  to_number(substr(id, 2, 2)) AS year, to_number( substr(id, 4, 2)) as month, count(*) AS counter
+    FROM kandidaadid WHERE is_number(id) = 1 GROUP BY substr(id, 2, 2),substr(id, 4, 2) ORDER BY substr(id, 2, 2),substr(id, 4, 2)';
+        LOOP
+            FETCH cur INTO v_year, v_month, v_counter;
+            IF v_year <= max_synniaasta AND v_year >= min_synniaasta THEN
+                dbms_output.put_line('19' || v_year || '. a. ' || v_month || '. kuus on sundinud ' || v_counter || ' kandidaati');
+            END IF;
+            EXIT WHEN cur%NOTFOUND;
+        END LOOP;
+    CLOSE cur;
+END;
+/
+
+1982. a. 1. kuus on sundinud 1 kandidaati
+1982. a. 2. kuus on sundinud 1 kandidaati
+1982. a. 6. kuus on sundinud 1 kandidaati
+1982. a. 8. kuus on sundinud 1 kandidaati
+1982. a. 9. kuus on sundinud 1 kandidaati
+1982. a. 11. kuus on sundinud 1 kandidaati
+1982. a. 12. kuus on sundinud 2 kandidaati
+1983. a. 2. kuus on sundinud 2 kandidaati
+1983. a. 4. kuus on sundinud 2 kandidaati
+1983. a. 7. kuus on sundinud 1 kandidaati
+1983. a. 8. kuus on sundinud 1 kandidaati
+1983. a. 11. kuus on sundinud 1 kandidaati
+1983. a. 12. kuus on sundinud 4 kandidaati
+1984. a. 1. kuus on sundinud 2 kandidaati
+1984. a. 3. kuus on sundinud 1 kandidaati
+1984. a. 4. kuus on sundinud 2 kandidaati
+1984. a. 5. kuus on sundinud 1 kandidaati
+1984. a. 6. kuus on sundinud 12 kandidaati
+1984. a. 7. kuus on sundinud 2 kandidaati
+1984. a. 8. kuus on sundinud 3 kandidaati
+1984. a. 9. kuus on sundinud 4 kandidaati
+1984. a. 10. kuus on sundinud 2 kandidaati
+1984. a. 11. kuus on sundinud 6 kandidaati
+1984. a. 12. kuus on sundinud 9 kandidaati
+
+
+
+2. Kasutage asendusmuutujaid (accept-lausete abil) ning
+sisestage uue kandidaadi isikukood, ees- ja perenimi ning kolme
+eksami tulemused. .....
+
+SET verify off
+SET serveroutput on
+
+ACCEPT isikukood PROMPT 'Enter value for - isikukood (for example: 50001040268): '
+ACCEPT eesnimi PROMPT 'Enter value for - eesnimi (for example: Andre): '
+ACCEPT perenimi PROMPT 'Enter value for - perekonna nimi (for example: Tinits): '
+ACCEPT matemaatika PROMPT 'Enter value for - matemaatika tulemus (from 0 to 100): '
+ACCEPT voorkeel PROMPT 'Enter value for - voorkeele tulemus (from 0 to 100): '
+ACCEPT emakeel PROMPT 'Enter value for - emakeele tulemus (from 0 to 100): '
+
+DECLARE
+    v_id          kandidaadid.id%TYPE;
+    v_eesnimi     kandidaadid.eesnimi%TYPE  := '&eesnimi';
+    v_perenimi    kandidaadid.perenimi%TYPE := '&perenimi';
+    v_matemaatika kandidaadid.matemaatika%TYPE;
+    v_voorkeel    kandidaadid.voorkeel%TYPE;
+    v_emakeel     kandidaadid.emakeel%TYPE;
+    v_id_count    INT                       := 0;
+BEGIN
+    IF is_number('&isikukood') = 0 OR LENGTH('&isikukood') != 11 THEN
+        raise_application_error(-20001, 'Teie sisestatud isikukood (' || '&isikukood' || ') ei vasta nõutud tingimustele (11 numbrit)');
+    END IF;
+
+    v_id := '&isikukood';
+
+    SELECT count(k.id)
+    INTO v_id_count
+    FROM kandidaadid k
+    WHERE k.id = v_id;
+
+    IF v_id_count > 0 THEN
+        raise_application_error(-20001, 'Selline isikukood (' || '&isikukood' || ') on andmebaasis juba olemas');
+    END IF;
+
+    IF is_number('&matemaatika') = 0 OR '&matemaatika' > 100 OR '&matemaatika' < 0 OR MOD('&matemaatika', 1) > 0 THEN
+        raise_application_error(-20001, 'Teie sisestatud matemaatika tulemus (' || '&matemaatika' ||
+                                        ') ei vasta nõutud tingimustele (number from 0 to 100)');
+    ELSIF is_number('&voorkeel') = 0 OR '&voorkeel' > 100 OR '&voorkeel' < 0 OR MOD('&voorkeel', 1) > 0 THEN
+        raise_application_error(-20001, 'Teie sisestatud võõrkeele tulemus (' || '&voorkeel' ||
+                                        ') ei vasta nõutud tingimustele (number from 0 to 100)');
+    ELSIF is_number('&emakeel') = 0 OR '&emakeel' > 100 OR '&emakeel' < 0 OR MOD('&emakeel', 1) > 0 THEN
+        raise_application_error(-20001, 'Teie sisestatud emakeele tulemus (' || '&emakeel' ||
+                                        ') ei vasta nõutud tingimustele (number from 0 to 100)');
+    END IF;
+
+    v_matemaatika := to_number('&matemaatika');
+    v_voorkeel := to_number('&voorkeel');
+    v_emakeel := to_number('&emakeel');
+
+    INSERT INTO kandidaadid (id, eesnimi, perenimi, matemaatika, voorkeel, emakeel)
+    VALUES (v_id, v_eesnimi, v_perenimi, v_matemaatika, v_voorkeel, v_emakeel);
+END;
+/
+COMMIT;
+
+Testime kas andmed on sisestatud:
+
+SELECT * FROM kandidaadid WHERE id = '50001040268'
+
++-----------+-------+--------+-----------+--------+-------+
+|ID         |EESNIMI|PERENIMI|MATEMAATIKA|VOORKEEL|EMAKEEL|
++-----------+-------+--------+-----------+--------+-------+
+|50001040268|Andre  |Tinits  |13         |60      |80     |
++-----------+-------+--------+-----------+--------+-------+
+
+

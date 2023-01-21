@@ -1,0 +1,95 @@
+1. Moodustage tabel tallede kohta...
+
+CREATE TABLE talled
+(
+    id        INT CONSTRAINT talled_pk PRIMARY KEY,
+    sunniaeg  DATE NOT NULL,
+    sunnikaal INT  NOT NULL,
+    sugu      CHAR NOT NULL
+);
+
+CREATE SEQUENCE talled_sequence START WITH 1;
+
+skript:
+
+ACCEPT sunniaeg PROMPT 'talle sünniaeg (DD.MM.YYYY): '
+ACCEPT sunnikaal PROMPT 'talle sünnikaal grammides (number) :'
+ACCEPT sugu PROMPT 'talle sugu utt või jäär - (u või j) :'
+
+DECLARE
+    sequence_next_value INT := talled_sequence.nextval;
+BEGIN
+    IF '&sugu' = 'u' AND MOD(sequence_next_value, 2) = 0 THEN
+        INSERT INTO talled (id, sunniaeg, sunnikaal, sugu)
+        VALUES (sequence_next_value, TO_DATE('&sunniaeg', 'DD.MM.YYYY'), '&sunnikaal', '&sugu');
+    ELSIF '&sugu' = 'u' AND MOD(sequence_next_value, 2) = 1 THEN
+        INSERT INTO talled (id, sunniaeg, sunnikaal, sugu)
+        VALUES (talled_sequence.nextval, TO_DATE('&sunniaeg', 'DD.MM.YYYY'), '&sunnikaal', '&sugu');
+    ELSIF '&sugu' = 'j' AND MOD(sequence_next_value, 2) = 1 THEN
+        INSERT INTO talled (id, sunniaeg, sunnikaal, sugu)
+        VALUES (sequence_next_value, TO_DATE('&sunniaeg', 'DD.MM.YYYY'), '&sunnikaal', '&sugu');
+    ELSIF '&sugu' = 'j' AND MOD(sequence_next_value, 2) = 0 THEN
+        INSERT INTO talled (id, sunniaeg, sunnikaal, sugu)
+        VALUES (talled_sequence.nextval, TO_DATE('&sunniaeg', 'DD.MM.YYYY'), '&sunnikaal', '&sugu');
+    END IF;
+END;
+COMMIT;
+
++--+----------+---------+----+
+|ID|SUNNIAEG  |SUNNIKAAL|SUGU|
++--+----------+---------+----+
+|2 |22.02.21  |900      |u   |
++--+----------+---------+----+
+
+2. Moodustage vaade, mis selekteerib tabelitest lepikult.yliopilased,
+lepikult.oppeained ja lepikult.koduylesanded õppeaine „Oracle…“
+kohta saadetud kodutööde punktisummad:
+
+GRANT SELECT ON lepikult.yliopilased TO AABDULLAJEV with grant option;
+GRANT SELECT ON lepikult.koduylesanded TO AABDULLAJEV with grant option;
+GRANT SELECT ON lepikult.oppeained TO AABDULLAJEV with grant option;
+
+CREATE VIEW kodupunktisum AS
+SELECT (y.perenimi || ', ' || y.eesnimi) AS nimi, sum(k.punktid) AS punktid
+FROM lepikult.oppeained o
+         JOIN lepikult.koduylesanded k ON o.kood = k.kursusekood
+         JOIN lepikult.yliopilased y ON y.id = k.yliopilase_id
+WHERE o.nimetus LIKE '%Oracle%'
+GROUP BY (y.perenimi || ', ' || y.eesnimi);
+
++------------+-------+
+|NIMI        |PUNKTID|
++------------+-------+
+|Kask, Katrin|15     |
+|Saar, Salme |16     |
+|Vaher, Liina|8      |
+|M„nd, Kairi |10     |
++------------+-------+
+
+3. Andke kasutajale scott selle vaate vaatamisõigus:
+
+GRANT SELECT ON AABDULLAJEV.kodupunktisum TO scott;
+
+SELECT * FROM AABDULLAJEV.kodupunktisum;
+
++------------+-------+
+|NIMI        |PUNKTID|
++------------+-------+
+|Kask, Katrin|15     |
+|Saar, Salme |16     |
+|Vaher, Liina|8      |
+|M„nd, Kairi |10     |
++------------+-------+
+
+4. Leidke esimesed kaks, kes on saanud aines „Oracle…“ kõige suurema punktisumma:
+
+SELECT * FROM AABDULLAJEV.kodupunktisum ORDER BY PUNKTID DESC FETCH FIRST 2 ROW ONLY;
+
++------------+-------+
+|NIMI        |PUNKTID|
++------------+-------+
+|Saar, Salme |16     |
+|Kask, Katrin|15     |
++------------+-------+
+
+

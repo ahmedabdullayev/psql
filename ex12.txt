@@ -1,0 +1,93 @@
+1. Tehke endale koopia tabelist lepikult.koduylesanded. Koostage
+programm, kustutab tehtud koopiast need ülesanded, mis on
+saadetud „topelt“ – sama üliõpilase poolt sama kursuse ja sama
+numbriga töö kohta. Alles jätke parim tulemus. Kasutage ülesande
+lahendamiseks kursorit.
+
+CREATE TABLE koduylesanded AS (SELECT * FROM lepikult.koduylesanded);
+
+Kokku ridu tabelis enne skripti käivitamist:
++---------+
+|TOTALROWS|
++---------+
+|17       |
++---------+
+
+
+DECLARE
+    CURSOR cur IS SELECT *
+                  FROM (SELECT yliopilase_id,
+                                  kursusekood,
+                                  too_nr,
+                                  punktid,
+                                  ROW_NUMBER()
+                                          OVER (PARTITION BY yliopilase_id,kursusekood, too_nr ORDER BY punktid DESC ) AS rn
+                           FROM AABDULLAJEV.koduylesanded
+                           GROUP BY yliopilase_id, kursusekood, too_nr, punktid
+                           ORDER BY punktid DESC) tulemus
+                  WHERE tulemus.rn > 1;
+    rw cur%ROWTYPE;
+BEGIN
+    FOR rw IN cur
+        LOOP
+            DELETE
+            FROM koduylesanded
+            WHERE kursusekood = rw.kursusekood
+              AND yliopilase_id = rw.yliopilase_id
+              AND too_nr = rw.too_nr
+              AND punktid = rw.punktid;
+        END LOOP;
+END;
+/
+
+Nüüd kokku ridu tabelis pärast skripti käivitamist:
++---------+
+|TOTALROWS|
++---------+
+|16       |
++---------+
+
+
+2. Koosada programm, mis tabelite lepikult.yliopilased,
+lepikult.koduylesanded ja lepikult.oppeained alusel väljastab iga
+üliõpilase nime juurde need kursused, mille kohta ta ainsatki
+kodutööd esitanud ei ole. 
+
+
+SET verify off
+SET serveroutput on
+DECLARE
+    CURSOR opil_cur IS SELECT * FROM lepikult.yliopilased;
+    CURSOR oppea IS SELECT * FROM lepikult.oppeained;
+    opil_row      opil_cur%ROWTYPE;
+    oppea_row     oppea%ROWTYPE;
+    counter       NUMBER;
+    result_string VARCHAR2(255);
+BEGIN
+    FOR opil_row IN opil_cur
+        LOOP
+            dbms_output.put('Opilane ' || opil_row.eesnimi || ' ' || opil_row.perenimi || ' ei ole esitanud ainsatki tööd aines: ');
+            result_string := '';
+            FOR oppea_row IN oppea
+                LOOP
+                    SELECT count(*)
+                    INTO counter
+                    FROM lepikult.koduylesanded
+                    WHERE kursusekood = oppea_row.kood
+                      AND yliopilase_id = opil_row.id;
+                    IF counter = 0 THEN
+                        result_string := result_string || oppea_row.nimetus || ', ';
+                    END IF;
+                END LOOP;
+            dbms_output.put_line(RTRIM(result_string, ', '));
+        END LOOP;
+END;
+/
+
+Tulemus:
+
+Opilane Katrin Kask ei ole esitanud ainsatki t??d aines: Digitaalne heli- ja pildit””tlus
+Opilane Tarmo Kuusk ei ole esitanud ainsatki t??d aines: Oracle:  SQL ja PL/SQL, Operatsioonis?steemide tehnoloogia, Digitaalkommunikatsioon, Digitaalne heli- ja pildit””tlus, Riistvaral„hedane programmeerimine
+Opilane Kairi M„nd ei ole esitanud ainsatki t??d aines: Operatsioonis?steemide tehnoloogia, Digitaalne heli- ja pildit””tlus
+Opilane Salme Saar ei ole esitanud ainsatki t??d aines: Operatsioonis?steemide tehnoloogia, Riistvaral„hedane programmeerimine
+Opilane Liina Vaher ei ole esitanud ainsatki t??d aines: Operatsioonis?steemide tehnoloogia, Digitaalkommunikatsioon, Digitaalne heli- ja pildit””tlus

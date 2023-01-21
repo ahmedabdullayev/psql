@@ -1,0 +1,322 @@
+1. Looge „bind“-tüüpi arvuline muutuja. Kirjutage PL/SQLprogramm (anonüümne blokk), mis salvestab sellesse muutujasse
+parima võõrkeeletulemuse tabelist ...
+
+VARIABLE best_score NUMBER;
+
+BEGIN
+    SELECT MAX(voorkeel) INTO :best_score FROM kandidaadid;
+END;
+/
+SELECT  eesnimi, perenimi, :best_score - voorkeel || 'p' AS "parimale alla jääb" FROM lepikult.kandidaadid;
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+Pirjo                Kask                           32p                                      
+Mari                 Maasikas                       10p                                      
+Liina                Vaarikas                       14p                                      
+KRISTJAN             MAAPALU                        58p                                      
+GERD                 SIIMON                         51p                                      
+TANEL                VIHMANN                        54p                                      
+MAURI                TOMP                           57p                                      
+DENIS                SEPP                           68p                                      
+KRISTJAN             BREMANN                        61p                                      
+OLEG                 ISRAEL                         60p                                      
+OLIVER               DANILAS                        57p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+VELLO                KOHARI                         78p                                      
+KAIRE                PILDER                         60p                                      
+MAIK                 TEDER                          64p                                      
+INDREK               ZAHKNA                         72p                                      
+EVELIN               ELJANDI                        68p                                      
+MAREK                TREI                           71p                                      
+KATI                 TAMM                           37p                                      
+KALLE                VARES                          26p                                      
+MART                 NIMMERFELDT                    52p                                      
+PRIIT                RAMMUL                         62p                                      
+MAREK                KORB                           46p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+SANDER               M?NNASSON                      26p                                      
+VALTER               KIIS                           24p                                      
+MAREK                PIKKAR                         44p                                      
+LEONID               OTSALAINEN                     50p                                      
+ILJA                 PIKK                           47p                                      
+KASPAR               PIKANI                         56p                                      
+SIIM                 MOORAST                        47p                                      
+SVEN                 MUTLI                          57p                                      
+JAANO                PAAP                           2p                                       
+HEIMAR               KALLAK                         2p                                       
+JAAN                 LEIN                           1p                                       
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+AIMAR                HALLIKMA                       0p                                       
+ILMAR                BAUMAN                         7p                                       
+ALAR                 EMAJ†E                        8p                                       
+TANEL                AADLI                          14p                                      
+MIKK                 PRIKS                          10p                                      
+EERO                 METS                           17p                                      
+MEELIS               SOIKKA                         4p                                       
+JANIKA               ASSOR                          19p                                      
+ARTJOM               KILK                           31p                                      
+TAAVI                AASAV                          25p                                      
+ALEKSEI              PIIRSALU                       29p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+HARRI                ADER                           17p                                      
+MARTIN               TOMINGAS                       51p                                      
+TIMO                 PIHL                           4p                                       
+ANDREI               JAKSON                         3p                                       
+MART                 LELUMEES                       4p                                       
+NEEME                LEIBAK                         10p                                      
+MARTIN               EENSAAR                        6p                                       
+ELMO                 EENSAAR                        22p                                      
+URMAS                ANDRE                          4p                                       
+MIHKEL               MALSROOS                       23p                                      
+VIRGO                J?RVEOJA                       9p                                       
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+SILVER               PALLO                          14p                                      
+TAUNO                KARU                           16p                                      
+KARIINA              ?MARIK                         18p                                      
+MARKO                NIRK                           14p                                      
+TARMO                LEHEMAA                        19p                                      
+RAUL                 PALLAS                         5p                                       
+ALVAR                VEILBERG                       1p                                       
+MIHKEL               NEIMAR                         21p                                      
+JAANUS               SAAR                           10p                                      
+SIIM                 N†OMAA                        14p                                      
+M?RTEN               R†IGAS                        8p                                       
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+ALLAN                R??TELMAA                      10p                                      
+REEMET               PETROV                         15p                                      
+J?RI                 GROSSMANN                      20p                                      
+ALEKSANDR            KOOP                           12p                                      
+REINO                LAAST                          22p                                      
+LAURI                ERVALD                         17p                                      
+MAKSIM               OTTAS                          10p                                      
+ILLE                 VEILBERG                       6p                                       
+MARJU                HILLEP                         21p                                      
+NATALIA              RAUDSEPP                       8p                                       
+MADIS                ROSEN                          19p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+RENNO                LAUR                           23p                                      
+ALLAN                NURMITS                        23p                                      
+URMO                 PEETS                          17p                                      
+TIIT                 HIRV                           23p                                      
+PRIIT                LIGI                           28p                                      
+RAUNO                METSAOTS                       19p                                      
+TANEL                KROON                          27p                                      
+MAREK                KIRSIPUU                       27p                                      
+KIRILL               S†MER                         24p                                      
+MIHKEL               KALDVEE                        42p                                      
+SIIM                 K†IV                          31p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+KAAREL               KALJUR                         31p                                      
+KASPAR               SOKK                           15p                                      
+TRIIN                PEENSALU                       16p                                      
+KRISTJAN             PALUTAJA                       31p                                      
+PRIIDIK              BAMBERG                        16p                                      
+PRIIT                M?TLIK                         40p                                      
+TOOMAS               MIHELSON                       25p                                      
+DENISS               ANDRESSON                      37p                                      
+M?T                  KALLASTE                       20p                                      
+RAGNAR               JAAKSOO                        27p                                      
+IVO                  NILK                           20p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+HANNES               J?RVI                          23p                                      
+MIKK                 SARAPU                         24p                                      
+TOOM                 TIIDEMANN                      35p                                      
+VERONIKA             V?LI                           6p                                       
+AHTI                 KAIGAS                         28p                                      
+MARKUS               KUZNETSOV                      30p                                      
+JAANUS               VILLEMS                        16p                                      
+MART                 VESIAID                        19p                                      
+ROLAND               LUMBERG                        18p                                      
+JAANUS               JAASKA                         12p                                      
+ANDRE                LEINVALD                       24p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+LAAS                 FOMAT?KIN                      16p                                      
+ARVO                 VILLEMS                        26p                                      
+ERASMUS              BONDARVE                       29p                                      
+PAMELA               BESSONOV                       29p                                      
+ALEKSEI              JALASTO                        14p                                      
+KAAREL               T†RTO?N†I                     19p                                      
+TAAVO                LEINO                          27p                                      
+LAURI                SELGE                          29p                                      
+MEELIS               MEDAR                          32p                                      
+RAIDO                H†BE                          35p                                      
+VERON                M?E                            23p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+ANNELY               MESILA                         26p                                      
+EGON                 LEHTER                         34p                                      
+SVEN                 KOSHELEV                       33p                                      
+VAIKO                TATTER                         33p                                      
+ALEKSANDR            RUUS                           18p                                      
+MARTI                ROOTS                          21p                                      
+KEIO-MARGUS          RIKKEN                         32p                                      
+JOHAN                SEPP                           35p                                      
+KRISTO               MARTINSON                      50p                                      
+ARNE                 VALDAS                         55p                                      
+ALEKSANDR            LILLAK                         39p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+EIRIK                PALLOTEDDER                    42p                                      
+KAIMO                M?E                            42p                                      
+LEHOR                LAMP                           33p                                      
+IVARI                RANDMA                         34p                                      
+SILVER               LIIVAK                         45p                                      
+ANTTI                L??NE                          29p                                      
+MARVIN               †UNAPUU                       43p                                      
+ERKKI                S†LG                          40p                                      
+PRIIT                PIIRSALU                       43p                                      
+JANEK                TASANE                         28p                                      
+CAROLYN              ALEKSEJEV                      29p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+NELE                 MARNAUSSOV                     28p                                      
+OLGA                 PRIKS                          40p                                      
+TORMI                M†NJAM                        29p                                      
+PEEP                 PRIKS                          44p                                      
+KALEV                SEEBA                          53p                                      
+ALARI                MOISAR                         30p                                      
+SIIM                 EERME                          46p                                      
+MART                 MAIMISTON                      27p                                      
+VILJO                LEIN                           24p                                      
+REILI                SAGAJA                         40p                                      
+LAURI                POLL                           46p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+MIHKEL               HINTSOV                        40p                                      
+KRISTO               VOOGLA                         41p                                      
+ERKKI                KOOKLA                         42p                                      
+KRISTJAN             KAMBEK                         31p                                      
+VEIKO                EDING                          57p                                      
+AHTO                 EMAJ†E                        32p                                      
+RAIT                 DAUB                           40p                                      
+MARTIN               AUN                            36p                                      
+MIHKEL               AAVIK                          43p                                      
+TIIT                 RANDNA                         48p                                      
+ROMAN                JAAKSON                        31p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+ERKI                 4464                           35p                                      
+GERT                 K†IV                          46p                                      
+ALEKSANDRA           SILLAMAA                       46p                                      
+KAUR                 P†LDMAA                       47p                                      
+KADRI                KAIS                           28p                                      
+MARTIN               ONOHHOV                        51p                                      
+INDREK               LEIST                          46p                                      
+VELLO                TELVAR                         26p                                      
+OTT                  KILP                           39p                                      
+ANDRES               TAUR                           36p                                      
+KERT                 ERDMANN                        46p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+RAVEL                EVERT                          37p                                      
+RENNAT               VEERBAUM                       50p                                      
+MARITE               JEGONJAN                       43p                                      
+JOOSEP               VEERSALU                       54p                                      
+TAURI                J?RGENSON                      42p                                      
+KERDO                P?RNASTE                       48p                                      
+MARTIN               VASSUS                         49p                                      
+IGOR                 LABE                           57p                                      
+PRIIT                SAAR                           66p                                      
+SIIM                 LAURIMAA                       50p                                      
+HENDRIK              VALLER                         48p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+ERIK                 ERVIN                          54p                                      
+KRISTJAN             MULD                           43p                                      
+TARVO                TELLING                        55p                                      
+MATTIAS              PILV                           60p                                      
+RANNER               LIGI                           71p                                      
+TARMO                VILT                           55p                                      
+MAIT                 LEIGER                         46p                                      
+REIMO                KLASEN                         50p                                      
+MARIO                REBANE                         72p                                      
+PRIIT                †IGLANE                       52p                                      
+MARTIN               ENNUS                          55p                                      
+
+EESNIMI              PERENIMI                       parimale alla jaab                       
+-------------------- ------------------------------ -----------------------------------------
+MART                 J†GEVA                        64p                                      
+KUUNO                HEIN                           67p                                      
+REIGO                VASSUS                         65p                                      
+Jaan                 Sepp                           44p                                      
+gerda                Spuul                          94p                                      
+Pirjo                Kuusemaa                       21p                                      
+Mari                 Maasikas                       79p                                      
+
+205 rows selected. 
+
+
+2. Kasutage tabeleid lepikult.oppeained, lepikult.koduylesanded ja
+lepiult.yliopilased. Kirjutage PL/SQL-programm, mis kasutab kaht
+asendusmuutujat - ühega määratakse õppeaine, teisega üliõpilase
+nimi. Leidke, ...
+
+SET verify off
+SET serveroutput on
+ACCEPT oppeaine PROMPT 'Enter value for subject - oppeaine (for example: Oracle): '
+ACCEPT eesnimi PROMPT 'Enter value for name - eesnimi (for example: Katrin): '
+
+DECLARE
+    v_oppeaine oppeained.nimetus%TYPE    := '&oppeaine';
+    v_eesnimi  yliopilased.eesnimi%TYPE  := '&eesnimi';
+    v_perenimi yliopilased.perenimi%TYPE;
+    v_punktid  koduylesanded.punktid%TYPE;
+    v_tood     LONG;
+BEGIN
+    SELECT tulemus.eesnimi,
+           tulemus.perenimi,
+           sum(tulemus.punktid) AS punktid,
+           count(too_nr)        AS tood
+    INTO v_eesnimi, v_perenimi, v_punktid, v_tood
+    FROM (
+             SELECT y.eesnimi,
+                    y.perenimi,
+                    k.punktid,
+                    k.too_nr,
+                    ROW_NUMBER()
+                            OVER (PARTITION BY eesnimi,perenimi,too_nr ORDER BY eesnimi,perenimi,too_nr, punktid DESC ) AS rn
+             FROM lepikult.oppeained o
+                      JOIN lepikult.koduylesanded k ON o.kood = k.kursusekood
+                      JOIN lepikult.yliopilased y ON y.id = k.yliopilase_id
+             WHERE upper(o.nimetus) LIKE upper(v_oppeaine || '%')
+               AND upper(y.eesnimi) LIKE upper(v_eesnimi  || '%')
+             GROUP BY eesnimi, perenimi, too_nr, punktid
+             ORDER BY k.too_nr, k.punktid DESC) tulemus
+    WHERE tulemus.rn = 1
+    GROUP BY eesnimi, perenimi;
+    dbms_output.put_line('Üliõpilane: ' || v_eesnimi || ' ' || v_perenimi  || ', tehtud tööd: ' ||  v_tood  || ', punktid kokku: ' ||  v_punktid);
+END;
+/
+
+TULEMUS kui eesnimi 'Katrin' jah õppeaine 'Oracle':
+
+ÜliÕpilane: Katrin Kask, tehtud tööd: 2, punktid kokku: 15
+
